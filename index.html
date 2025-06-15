@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Surprise for Nikhila!</title>
+    
+    <!-- Google Fonts for aesthetic text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- General & Body Styling --- */
+        :root {
+            --primary-color: #ff8fab; /* A soft, celebratory pink */
+            --secondary-color: #f8c9d3;
+            --dark-bg: #1a1a1a; /* Stylish dark background */
+            --light-text: #f0f0f0;
+            --dark-text: #333;
+            --card-bg: #2c2c2c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            overflow: hidden; /* Prevents scrolling between layers */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        /* --- Layer Management --- */
+        .layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.7s ease-in-out, visibility 0.7s ease-in-out;
+        }
+
+        .layer.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* --- General Components --- */
+        .content-box {
+            background: var(--card-bg);
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-color);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: var(--dark-text);
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 25px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 143, 171, 0.4);
+        }
+
+        /* --- Layer 1: The Surprise --- */
+        #layer1 h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        /* --- Layer 2: Photo Gallery --- */
+        #layer2 h2 {
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+        }
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .photo-card {
+            aspect-ratio: 1 / 1;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .photo-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 143, 171, 0.3);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* --- Layer 3: The Question --- */
+        #layer3 .content-box {
+            position: relative; /* For the 'no' button positioning */
+        }
+        #layer3 h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        #no-btn {
+            background-color: #555;
+            color: var(--light-text);
+            position: relative;
+            transition: top 0.2s, left 0.2s; /* Smooth movement */
+        }
+
+        /* --- Layer 4: Final Wish --- */
+        #layer4 h1 {
+            font-size: 4rem;
+            text-shadow: 0 0 20px rgba(255, 143, 171, 0.7);
+        }
+        #layer4 p {
+            font-size: 1.2rem;
+            margin-top: 15px;
+            color: var(--secondary-color);
+        }
+        #confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Place behind the text */
+        }
+
+        /* --- Modal Styling --- */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 1000;
+        }
+        
+        #modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 90%;
+            max-height: 90vh;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        #modal-overlay.active .modal-content {
+             transform: scale(1);
+        }
+
+        #modal-img {
+            max-width: 100%;
+            max-height: 60vh;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        #modal-text {
+            font-size: 1.1rem;
+            text-align: center;
+            color: var(--light-text);
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .close-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .photo-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            .content-box {
+                padding: 30px 25px;
+            }
+            #layer1 h1, #layer3 h2 { font-size: 2rem; }
+            #layer4 h1 { font-size: 3rem; }
+        }
+
+        @media (max-width: 480px) {
+            .photo-grid {
+                grid-template-columns: 1fr;
+            }
+            #layer4 h1 { font-size: 2.5rem; }
+            #layer4 p { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Layer 1: The Initial Surprise -->
+    <div id="layer1" class="layer active">
+        <div class="content-box">
+            <h1>A Special Birthday Surprise Just For You!</h1>
+            <button id="unwrap-btn" class="btn">Click to Unwrap</button>
+        </div>
+    </div>
+
+    <!-- Layer 2: The Photo Memories Gallery -->
+    <div id="layer2" class="layer">
+        <h2>A walk down memory lane...</h2>
+        <div class="photo-grid">
+            <!-- CUSTOMIZE HERE: Replace image src and data-text for each card -->
+            <div class="photo-card" data-text="Remember this crazy trip? One of the best weekends ever!">
+                <img src="https://images.unsplash.com/photo-1503434396599-0bab2d435c24?w=500&q=80" alt="Memory 1">
+            </div>
+            <div class="photo-card" data-text="Our graduation day! We finally made it. So proud of us.">
+                <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500&q=80" alt="Memory 2">
+            </div>
+            <div class="photo-card" data-text="That time we tried to cook and almost burned the kitchen down. Totally worth it!">
+                <img src="https://images.unsplash.com/photo-1556911220-bff31c812dba?w=500&q=80" alt="Memory 3">
+            </div>
+            <div class="photo-card" data-text="Just a random silly selfie. Your smile always brightens my day!">
+                <img src="https://images.unsplash.com/photo-1512552288940-3d3a13a24148?w=500&q=80" alt="Memory 4">
+            </div>
+            <div class="photo-card" data-text="Dancing the night away like nobody was watching. We need to do this again soon!">
+                <img src="https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?w=500&q=80" alt="Memory 5">
+            </div>
+            <div class="photo-card" data-text="Chilling by the beach. Moments like these with you are my favorite.">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723a996f6ea?w=500&q=80" alt="Memory 6">
+            </div>
+        </div>
+        <button id="next-to-layer3-btn" class="btn">One last thing...</button>
+    </div>
+    
+    <!-- Modal for displaying photos -->
+    <div id="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn">×</span>
+            <img id="modal-img" src="" alt="Enlarged Memory">
+            <p id="modal-text"></p>
+        </div>
+    </div>
+
+    <!-- Layer 3: The Big Question -->
+    <div id="layer3" class="layer">
+        <div class="content-box">
+            <h2>Do you love me?</h2>
+            <div class="button-container">
+                <button id="yes-btn" class="btn">YES!</button>
+                <button id="no-btn" class="btn">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Layer 4: The Final Birthday Wish -->
+    <div id="layer4" class="layer">
+        <canvas id="confetti-canvas"></canvas>
+        <h1>Happy Birthday, Nikhila!</h1>
+        <p>Wishing you a day as amazing as you are. Love you always!</p>
+    </div>
+
+    <!-- Confetti library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Element Selections ---
+            const layers = document.querySelectorAll('.layer');
+            const unwrapBtn = document.getElementById('unwrap-btn');
+            const nextToLayer3Btn = document.getElementById('next-to-layer3-btn');
+            const yesBtn = document.getElementById('yes-btn');
+            const noBtn = document.getElementById('no-btn');
+
+            const photoCards = document.querySelectorAll('.photo-card');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const modalImg = document.getElementById('modal-img');
+            const modalText = document.getElementById('modal-text');
+            const closeBtn = document.querySelector('.close-btn');
+
+            // --- Layer Transition Logic ---
+            const showLayer = (layerId) => {
+                layers.forEach(layer => {
+                    layer.classList.remove('active');
+                });
+                const targetLayer = document.getElementById(layerId);
+                if (targetLayer) {
+                    targetLayer.classList.add('active');
+                }
+            };
+            
+            // --- Event Listeners ---
+            
+            // Layer 1 to Layer 2
+            unwrapBtn.addEventListener('click', () => {
+                showLayer('layer2');
+            });
+
+            // Layer 2 to Layer 3
+            nextToLayer3Btn.addEventListener('click', () => {
+                showLayer('layer3');
+            });
+            
+            // Layer 3 to Layer 4 (YES button)
+            yesBtn.addEventListener('click', () => {
+                showLayer('layer4');
+                // Trigger confetti when the final layer is shown
+                triggerConfetti();
+            });
+
+            // Playful 'NO' button
+            noBtn.addEventListener('mouseover', () => {
+                const container = noBtn.parentElement.parentElement;
+                const containerRect = container.getBoundingClientRect();
+                const btnRect = noBtn.getBoundingClientRect();
+
+                let newTop = Math.random() * (containerRect.height - btnRect.height);
+                let newLeft = Math.random() * (containerRect.width - btnRect.width);
+                
+                // Keep button within the content box
+                newTop = Math.max(0, Math.min(newTop, containerRect.height - btnRect.height));
+                newLeft = Math.max(0, Math.min(newLeft, containerRect.width - btnRect.width));
+                
+                noBtn.style.position = 'absolute';
+                noBtn.style.top = `${newTop}px`;
+                noBtn.style.left = `${newLeft}px`;
+            });
+
+            // --- Photo Modal Logic ---
+            photoCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const imgSrc = card.querySelector('img').src;
+                    const text = card.getAttribute('data-text');
+                    
+                    modalImg.src = imgSrc;
+                    modalText.textContent = text;
+                    modalOverlay.classList.add('active');
+                });
+            });
+
+            const closeModal = () => {
+                modalOverlay.classList.remove('active');
+            };
+
+            closeBtn.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            
+            // --- Confetti Logic ---
+            const triggerConfetti = () => {
+                const canvas = document.getElementById('confetti-canvas');
+                const myConfetti = confetti.create(canvas, {
+                    resize: true,
+                    useWorker: true
+                });
+                
+                const duration = 5 * 1000;
+                const end = Date.now() + duration;
+
+                (function frame() {
+                    myConfetti({
+                        particleCount: 3,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 }
+                    });
+                    myConfetti({
+                        particleCount: 3,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 }
+                    });
+
+                    if (Date.now() < end) {
+                        requestAnimationFrame(frame);
+                    }
+                }());
+            };
+        });
+    </script>
+</body>
+</html>
