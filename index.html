@@ -248,13 +248,9 @@
         }
 
         @media (max-width: 480px) {
-             /* No change needed for the photo grid here, 2 columns often looks better on mobile too. 
-                If you prefer a single column, uncomment the line below. */
-            /* .photo-grid { grid-template-columns: 1fr; } */
-            
             #layer4 h1 { font-size: 2.5rem; }
             #layer4 p { font-size: 1rem; }
-            #layer2 { padding-top: 40px; } /* Slightly less padding on small screens */
+            #layer2 { padding-top: 40px; }
         }
     </style>
 </head>
@@ -272,7 +268,7 @@
     <div id="layer2" class="layer">
         <h2>Glitters of you through my 4.75 myopic lens</h2>
         <div class="photo-grid">
-            <!-- CUSTOMIZE HERE: Replace image src and data-text for each card -->
+            <!-- Your customized photos are here -->
             <div class="photo-card" data-text="Remember this crazy trip? One of the best weekends ever!">
                 <img src="https://i.ibb.co/dsNnchTw/photo1.jpg" alt="Memory 1">
             </div>
@@ -353,25 +349,17 @@
             
             // --- Event Listeners ---
             
-            // Layer 1 to Layer 2
-            unwrapBtn.addEventListener('click', () => {
-                showLayer('layer2');
-            });
-
-            // Layer 2 to Layer 3
-            nextToLayer3Btn.addEventListener('click', () => {
-                showLayer('layer3');
-            });
-            
-            // Layer 3 to Layer 4 (YES button)
+            unwrapBtn.addEventListener('click', () => showLayer('layer2'));
+            nextToLayer3Btn.addEventListener('click', () => showLayer('layer3'));
             yesBtn.addEventListener('click', () => {
                 showLayer('layer4');
-                // Trigger confetti when the final layer is shown
                 triggerConfetti();
             });
 
-            // Playful 'NO' button
-            noBtn.addEventListener('mouseover', () => {
+            // --- 'NO' BUTTON LOGIC (FIXED FOR MOBILE) ---
+
+            // NEW: Create a reusable function to move the button
+            const moveNoButton = () => {
                 const container = noBtn.parentElement.parentElement;
                 const containerRect = container.getBoundingClientRect();
                 const btnRect = noBtn.getBoundingClientRect();
@@ -386,6 +374,16 @@
                 noBtn.style.position = 'absolute';
                 noBtn.style.top = `${newTop}px`;
                 noBtn.style.left = `${newLeft}px`;
+            };
+
+            // For desktop users with a mouse
+            noBtn.addEventListener('mouseover', moveNoButton);
+
+            // NEW: For mobile/touch users
+            noBtn.addEventListener('touchstart', (event) => {
+                // Prevent the default touch behavior (like scrolling or clicking)
+                event.preventDefault(); 
+                moveNoButton();
             });
 
             // --- Photo Modal Logic ---
