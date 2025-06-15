@@ -31,10 +31,7 @@
             font-family: 'Montserrat', sans-serif;
             background-color: var(--dark-bg);
             color: var(--light-text);
-            overflow: hidden; /* Prevents scrolling between layers */
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            overflow: hidden; /* Prevents scrolling on non-scrollable layers */
             height: 100vh;
         }
         
@@ -98,8 +95,15 @@
             font-size: 2.5rem;
             margin-bottom: 20px;
         }
-
-        /* --- Layer 2: Photo Gallery --- */
+        
+        /* --- FIX FOR LAYER 2 RESPONSIVENESS --- */
+        #layer2 {
+            justify-content: flex-start; /* Align content to the top */
+            padding-top: 60px; /* Give space from the top of the screen */
+            padding-bottom: 60px; /* Give space for the last button */
+            overflow-y: auto; /* Allow vertical scrolling if content overflows */
+        }
+        
         #layer2 h2 {
             margin-bottom: 30px;
             font-size: 2.2rem;
@@ -133,7 +137,7 @@
         
         /* --- Layer 3: The Question --- */
         #layer3 .content-box {
-            position: relative; /* For the 'no' button positioning */
+            position: relative;
         }
         #layer3 h2 {
             font-size: 2.5rem;
@@ -148,7 +152,7 @@
             background-color: #555;
             color: var(--light-text);
             position: relative;
-            transition: top 0.2s, left 0.2s; /* Smooth movement */
+            transition: top 0.2s, left 0.2s;
         }
 
         /* --- Layer 4: Final Wish --- */
@@ -167,16 +171,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1; /* Place behind the text */
+            z-index: -1;
         }
 
         /* --- Modal Styling --- */
         #modal-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.8);
             display: flex;
             justify-content: center;
@@ -224,21 +226,18 @@
         
         .close-btn {
             position: absolute;
-            top: 15px;
-            right: 20px;
+            top: 15px; right: 20px;
             font-size: 2rem;
             color: #fff;
             cursor: pointer;
             transition: transform 0.2s ease;
         }
-        .close-btn:hover {
-            transform: scale(1.2);
-        }
+        .close-btn:hover { transform: scale(1.2); }
 
         /* --- Responsive Design --- */
         @media (max-width: 768px) {
             .photo-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(2, 1fr); /* 2 columns for tablets */
                 gap: 15px;
             }
             .content-box {
@@ -249,11 +248,13 @@
         }
 
         @media (max-width: 480px) {
-            .photo-grid {
-                grid-template-columns: 1fr;
-            }
+             /* No change needed for the photo grid here, 2 columns often looks better on mobile too. 
+                If you prefer a single column, uncomment the line below. */
+            /* .photo-grid { grid-template-columns: 1fr; } */
+            
             #layer4 h1 { font-size: 2.5rem; }
             #layer4 p { font-size: 1rem; }
+            #layer2 { padding-top: 40px; } /* Slightly less padding on small screens */
         }
     </style>
 </head>
